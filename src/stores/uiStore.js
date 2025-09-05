@@ -1,88 +1,48 @@
-// ===== src/stores/uiStore.js =====
-import { ref, computed, readonly } from 'vue'
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
 export const useUiStore = defineStore('ui', () => {
-  // 状态
+  const messages = ref([])
   const isLoading = ref(false)
-  const toast = ref({
-    show: false,
-    message: '',
-    type: 'info', // info, success, warning, error
-    duration: 3000
-  })
-  const modal = ref({
-    show: false,
-    component: null,
-    props: {}
-  })
-  const sidebar = ref({
-    show: false,
-    component: null
-  })
   
-  // 动作
+  const showMessage = (text, type = 'info', duration = 3000) => {
+    const id = Date.now()
+    const message = { id, text, type, timestamp: new Date() }
+    
+    messages.value.push(message)
+    
+    // 控制台输出消息
+    const emoji = {
+      success: '✅',
+      error: '❌', 
+      warning: '⚠️',
+      info: 'ℹ️'
+    }
+    
+    console.log(`${emoji[type] || 'ℹ️'} ${text}`)
+    
+    // 自动移除消息
+    setTimeout(() => {
+      const index = messages.value.findIndex(msg => msg.id === id)
+      if (index > -1) {
+        messages.value.splice(index, 1)
+      }
+    }, duration)
+  }
+  
+  const clearMessages = () => {
+    messages.value = []
+  }
+  
   const setLoading = (loading) => {
     isLoading.value = loading
   }
   
-  const showToast = (message, type = 'info', duration = 3000) => {
-    toast.value = {
-      show: true,
-      message,
-      type,
-      duration
-    }
-    
-    setTimeout(() => {
-      hideToast()
-    }, duration)
-  }
-  
-  const hideToast = () => {
-    toast.value.show = false
-  }
-  
-  const showModal = (component, props = {}) => {
-    modal.value = {
-      show: true,
-      component,
-      props
-    }
-  }
-  
-  const hideModal = () => {
-    modal.value.show = false
-    modal.value.component = null
-    modal.value.props = {}
-  }
-  
-  const showSidebar = (component) => {
-    sidebar.value = {
-      show: true,
-      component
-    }
-  }
-  
-  const hideSidebar = () => {
-    sidebar.value.show = false
-    sidebar.value.component = null
-  }
-  
   return {
-    // 状态
-    isLoading: readonly(isLoading),
-    toast: readonly(toast),
-    modal: readonly(modal),
-    sidebar: readonly(sidebar),
-    
-    // 动作
-    setLoading,
-    showToast,
-    hideToast,
-    showModal,
-    hideModal,
-    showSidebar,
-    hideSidebar
+    messages,
+    isLoading,
+    showMessage,
+    clearMessages,
+    setLoading
   }
 })

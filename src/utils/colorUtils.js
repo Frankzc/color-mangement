@@ -91,6 +91,7 @@ export const searchColors = (colors, query) => {
   return results.map(result => result.item)
 }
 
+/* 
 // 颜色筛选
 export const filterColors = (colors, filters) => {
   return colors.filter(color => {
@@ -114,6 +115,35 @@ export const filterColors = (colors, filters) => {
     
     return true
   })
+}
+*/
+
+export function filterColors(colors, filters) {
+  let result = [...colors]
+  
+  // 分类筛选
+  if (filters.category && filters.category !== '') {
+    result = result.filter(color => color.category === filters.category)
+  }
+  
+  // 标签筛选
+  if (filters.tags && filters.tags.length > 0) {
+    result = result.filter(color => 
+      filters.tags.some(tag => color.tags && color.tags.includes(tag))
+    )
+  }
+  
+  // 国风筛选 - 修复逻辑
+  if (filters.hasGuofeng === true) {
+    result = result.filter(color => {
+      return color.guofeng && 
+             color.guofeng !== null && 
+             color.guofeng !== '' && 
+             color.guofeng !== 'null'  // 处理字符串'null'的情况
+    })
+  }
+  
+  return result
 }
 
 // 颜色排序

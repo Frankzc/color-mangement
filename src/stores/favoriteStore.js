@@ -1,125 +1,67 @@
-// ===== src/stores/favoriteStore.js =====
 import { defineStore } from 'pinia'
-import { ref, computed , readonly} from 'vue' 
-import { useLocalStorage } from '@vueuse/core'
+import { ref, computed } from 'vue'
 
 export const useFavoriteStore = defineStore('favorite', () => {
-  // 使用本地存储持久化数据
-  const favoriteColors = useLocalStorage('fashion_color_favorites', [])
-  const colorSchemes = useLocalStorage('fashion_color_schemes', [])
-  const currentScheme = ref(null)
+  const favorites = ref([])
   
-  // 计算属性
-  const favoriteCount = computed(() => favoriteColors.value.length)
-  const schemeCount = computed(() => colorSchemes.value.length)
+  const favoriteColors = computed(() => favorites.value || [])
   
-  // 检查颜色是否已收藏
   const isFavorite = (hex) => {
-    return favoriteColors.value.some(color => color.hex === hex)
+    return (favorites.value || []).some(color => color.hex === hex)
   }
   
-  // 动作
-  const addToFavorites = (color) => {
-    if (!isFavorite(color.hex)) {
-      favoriteColors.value.push({
+  const toggleFavorite = (color) => {
+    if (!favorites.value) {
+      favorites.value = []
+    }
+    
+    const index = favorites.value.findIndex(fav => fav.hex === color.hex)
+    if (index > -1) {
+      favorites.value.splice(index, 1)
+    } else {
+      favorites.value.push({
         ...color,
         addedAt: new Date().toISOString()
       })
     }
+    
+    // 保存到本地存储
+    saveFavoritesToStorage()
   }
   
-  const removeFromFavorites = (hex) => {
-    const index = favoriteColors.value.findIndex(color => color.hex === hex)
-    if (index > -1) {
-      favoriteColors.value.splice(index, 1)
-    }
-  }
-  
-  const toggleFavorite = (color) => {
-    if (isFavorite(color.hex)) {
-      removeFromFavorites(color.hex)
-    } else {
-      addToFavorites(color)
-    }
-  }
-  
-  const createScheme = (name, colors, description = '') => {
-    const scheme = {
-      id: Date.now().toString(),
-      name,
-      colors,
-      description,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-    colorSchemes.value.push(scheme)
-    return scheme
-  }
-  
-  const updateScheme = (id, updates) => {
-    const index = colorSchemes.value.findIndex(scheme => scheme.id === id)
-    if (index > -1) {
-      colorSchemes.value[index] = {
-        ...colorSchemes.value[index],
-        ...updates,
-        updatedAt: new Date().toISOString()
+  const initializeFavorites = () => {
+    try {
+      const stored = localStorage.getItem('fashion-color-favorites')
+      if (stored) {
+        favorites.value = JSON.parse(stored)
+      } else {
+        favorites.value = []
       }
+    } catch (error) {
+      console.error('收藏数据加载失败:', error)
+      favorites.value = []
     }
   }
   
-  const deleteScheme = (id) => {
-    const index = colorSchemes.value.findIndex(scheme => scheme.id === id)
-    if (index > -1) {
-      colorSchemes.value.splice(index, 1)
+  const saveFavoritesToStorage = () => {
+    try {
+      localStorage.setItem('fashion-color-favorites', JSON.stringify(favorites.value))
+    } catch (error) {
+      console.error('收藏数据保存失败:', error)
     }
   }
   
-  const setCurrentScheme = (scheme) => {
-    currentScheme.value = scheme
-  }
-  
-  const clearFavorites = () => {
-    favoriteColors.value = []
-  }
-  
-  const exportData = () => {
-    return {
-      favorites: favoriteColors.value,
-      schemes: colorSchemes.value,
-      exportedAt: new Date().toISOString()
-    }
-  }
-  
-  const importData = (data) => {
-    if (data.favorites) {
-      favoriteColors.value = data.favorites
-    }
-    if (data.schemes) {
-      colorSchemes.value = data.schemes
-    }
+  const clearAllFavorites = () => {
+    favorites.value = []
+    saveFavoritesToStorage()
   }
   
   return {
-    // 状态
-    favoriteColors: readonly(favoriteColors),
-    colorSchemes: readonly(colorSchemes),
-    currentScheme: readonly(currentScheme),
-    
-    // 计算属性
-    favoriteCount,
-    schemeCount,
-    
-    // 动作
+    favorites,
+    favoriteColors,
     isFavorite,
-    addToFavorites,
-    removeFromFavorites,
     toggleFavorite,
-    createScheme,
-    updateScheme,
-    deleteScheme,
-    setCurrentScheme,
-    clearFavorites,
-    exportData,
-    importData
+    initializeFavorites,
+    clearAllFavorites
   }
 })

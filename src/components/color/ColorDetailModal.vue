@@ -1,164 +1,109 @@
-// ===== src/components/color/ColorDetailModal.vue =====
+<!-- 修复后的 ColorDetailModal.vue -->
 <template>
-  <Teleport to="body">
-    <div class="modal-overlay" @click.self="$emit('close')">
-      <div class="color-detail-modal">
-        <!-- 关闭按钮 -->
-        <button @click="$emit('close')" class="modal-close">
-          <XMarkIcon class="w-6 h-6" />
-        </button>
-
-        <!-- 颜色预览区 -->
-        <div class="color-preview" :style="{ backgroundColor: color.hex }">
-          <div class="color-preview__content" :style="{ color: color.contrast }">
-            <h1 class="color-preview__hex">{{ color.hex }}</h1>
-            <div class="color-preview__names">
-              <h2 class="chinese-name">{{ color.chinese }}</h2>
-              <p class="english-name">{{ color.english }}</p>
-            </div>
-            <div v-if="color.guofeng" class="guofeng-badge">
-              <span>国风：{{ color.guofeng }}</span>
-            </div>
-          </div>
+  <div class="modal-overlay" @click.self="$emit('close')">
+    <div class="color-detail-modal">
+      <button @click="$emit('close')" class="modal-close">
+        <XMarkIcon class="w-6 h-6" />
+      </button>
+      
+      <div class="color-preview" :style="{ backgroundColor: color.hex }">
+        <div class="color-info" :style="{ color: color.contrast }">
+          <h2 class="color-title">{{ color.chinese }}</h2>
+          <p class="color-subtitle">{{ color.english }}</p>
+          <p class="color-hex">{{ color.hex }}</p>
         </div>
-
-        <!-- 详细信息 -->
+      </div>
+      
+      <div class="modal-content">
         <div class="color-details">
-          <div class="details-grid">
-            <!-- 基本信息 -->
-            <div class="detail-section">
-              <h3 class="section-title">基本信息</h3>
-              <div class="info-list">
-                <div class="info-item">
-                  <span class="label">分类:</span>
-                  <span class="value category">{{ color.category }}</span>
-                </div>
-                <div class="info-item" v-if="color.pantone">
-                  <span class="label">Pantone:</span>
-                  <span class="value">{{ color.pantone }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">亮度:</span>
-                  <span class="value">{{ color.brightness || getBrightness(color.rgb) }}</span>
-                </div>
-              </div>
+          <div class="detail-group">
+            <h3>颜色信息</h3>
+            <div class="detail-item">
+              <span class="label">分类:</span>
+              <span class="value">{{ color.category }}</span>
             </div>
-
-            <!-- 色彩值 -->
-            <div class="detail-section">
-              <h3 class="section-title">色彩值</h3>
-              <div class="color-values">
-                <div class="value-item">
-                  <span class="value-label">HEX</span>
-                  <div class="value-content">
-                    <span class="value-text">{{ color.hex }}</span>
-                    <button @click="copyValue(color.hex)" class="copy-btn">
-                      <DocumentDuplicateIcon class="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                
-                <div class="value-item">
-                  <span class="value-label">RGB</span>
-                  <div class="value-content">
-                    <span class="value-text">{{ color.rgb.r }}, {{ color.rgb.g }}, {{ color.rgb.b }}</span>
-                    <button @click="copyValue(`rgb(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b})`)" class="copy-btn">
-                      <DocumentDuplicateIcon class="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                
-                <div class="value-item">
-                  <span class="value-label">CMYK</span>
-                  <div class="value-content">
-                    <span class="value-text">{{ color.cmyk.c }}%, {{ color.cmyk.m }}%, {{ color.cmyk.y }}%, {{ color.cmyk.k }}%</span>
-                    <button @click="copyValue(`cmyk(${color.cmyk.c}%, ${color.cmyk.m}%, ${color.cmyk.y}%, ${color.cmyk.k}%)`)" class="copy-btn">
-                      <DocumentDuplicateIcon class="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                
-                <div class="value-item" v-if="color.hsl">
-                  <span class="value-label">HSL</span>
-                  <div class="value-content">
-                    <span class="value-text">{{ color.hsl.h }}°, {{ color.hsl.s }}%, {{ color.hsl.l }}%</span>
-                    <button @click="copyValue(`hsl(${color.hsl.h}, ${color.hsl.s}%, ${color.hsl.l}%)`)" class="copy-btn">
-                      <DocumentDuplicateIcon class="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
+            <div class="detail-item">
+              <span class="label">RGB:</span>
+              <span class="value">{{ color.rgb.r }}, {{ color.rgb.g }}, {{ color.rgb.b }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">CMYK:</span>
+              <span class="value">{{ color.cmyk.c }}%, {{ color.cmyk.m }}%, {{ color.cmyk.y }}%, {{ color.cmyk.k }}%</span>
+            </div>
+            <div v-if="color.pantone" class="detail-item">
+              <span class="label">Pantone:</span>
+              <span class="value">{{ color.pantone }}</span>
+            </div>
+            <div v-if="color.guofeng && color.guofeng !== 'null'" class="detail-item">
+              <span class="label">国风名称:</span>
+              <span class="value guofeng">{{ color.guofeng }}</span>
             </div>
           </div>
-
-          <!-- 标签 -->
-          <div class="detail-section" v-if="color.tags && color.tags.length > 0">
-            <h3 class="section-title">时尚标签</h3>
-            <div class="tags-container">
-              <span
-                v-for="tag in color.tags"
-                :key="tag"
-                class="tag"
-                :class="getTagClass(tag)"
-              >
+          
+          <div v-if="color.tags && color.tags.length > 0" class="detail-group">
+            <h3>时尚标签</h3>
+            <div class="tags">
+              <span v-for="tag in color.tags" :key="tag" class="tag">
                 {{ tag }}
               </span>
             </div>
           </div>
-
-          <!-- 操作按钮 -->
-          <div class="actions-section">
-            <BaseButton
-              @click="toggleFavorite"
-              :variant="isFavorite ? 'danger' : 'primary'"
-              class="action-btn"
-            >
-              <HeartIcon :class="['w-4 h-4 mr-2', { 'fill-current': isFavorite }]" />
+          
+          <div class="actions">
+            <button @click="toggleFavorite" class="action-btn favorite-btn">
+              <HeartIcon :class="['icon', { 'is-favorite': isFavorite }]" />
               {{ isFavorite ? '取消收藏' : '添加收藏' }}
-            </BaseButton>
+            </button>
             
-            <BaseButton
-              @click="generateScheme"
-              variant="secondary"
-              class="action-btn"
-            >
-              <ColorSwatchIcon class="w-4 h-4 mr-2" />
-              生成配色
-            </BaseButton>
+            <button @click="generateScheme" class="action-btn scheme-btn">
+              <SwatchIcon class="icon" />
+              生成配色方案
+            </button>
             
-            <BaseButton
-              @click="findSimilar"
-              variant="secondary"
-              outline
-              class="action-btn"
-            >
-              <MagnifyingGlassIcon class="w-4 h-4 mr-2" />
-              相似颜色
-            </BaseButton>
+            <button @click="findSimilar" class="action-btn similar-btn">
+              <MagnifyingGlassIcon class="icon" />
+              查找相似颜色
+            </button>
           </div>
-
-          <!-- 相似颜色 -->
-          <div class="detail-section" v-if="similarColors.length > 0">
-            <h3 class="section-title">相似颜色</h3>
+          
+          <!-- 配色方案结果 -->
+          <div v-if="colorScheme.length > 0" class="scheme-result">
+            <h3>配色方案</h3>
+            <div class="scheme-colors">
+              <div 
+                v-for="(schemeColor, index) in colorScheme" 
+                :key="index"
+                class="scheme-color"
+                :style="{ backgroundColor: schemeColor.hex }"
+                :title="schemeColor.hex"
+              >
+                <span class="scheme-hex">{{ schemeColor.hex }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 相似颜色结果 -->
+          <div v-if="similarColors.length > 0" class="similar-result">
+            <h3>相似颜色</h3>
             <div class="similar-colors">
-              <div
-                v-for="similarColor in similarColors"
+              <div 
+                v-for="similarColor in similarColors" 
                 :key="similarColor.hex"
                 class="similar-color"
                 :style="{ backgroundColor: similarColor.hex }"
-                @click="$emit('color-change', similarColor)"
-                :title="`${similarColor.chinese} (${similarColor.hex})`"
+                @click="viewSimilarColor(similarColor)"
               >
-                <span :style="{ color: similarColor.contrast }">
-                  {{ similarColor.hex }}
-                </span>
+                <div class="similar-info">
+                  <span class="similar-name">{{ similarColor.chinese }}</span>
+                  <span class="similar-hex">{{ similarColor.hex }}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </Teleport>
+  </div>
 </template>
 
 <script setup>
@@ -166,15 +111,7 @@ import { ref, computed } from 'vue'
 import { useFavoriteStore } from '@stores/favoriteStore'
 import { useColorStore } from '@stores/colorStore'
 import { useUiStore } from '@stores/uiStore'
-import { getBrightness } from '@utils/colorUtils'
-import {
-  XMarkIcon,
-  HeartIcon,
-  DocumentDuplicateIcon,
-  SwatchIcon,
-  MagnifyingGlassIcon
-} from '@heroicons/vue/24/outline'
-import BaseButton from '@components/common/BaseButton.vue'
+import { XMarkIcon, HeartIcon, SwatchIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
   color: {
@@ -183,49 +120,55 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close', 'color-change'])
+const emit = defineEmits(['close', 'view-color'])
 
 const favoriteStore = useFavoriteStore()
 const colorStore = useColorStore()
 const uiStore = useUiStore()
 
+const colorScheme = ref([])
 const similarColors = ref([])
 
-// 计算属性
 const isFavorite = computed(() => favoriteStore.isFavorite(props.color.hex))
-
-// 方法
-const copyValue = async (value) => {
-  try {
-    await navigator.clipboard.writeText(value)
-    uiStore.showToast('已复制到剪贴板', 'success', 2000)
-  } catch (error) {
-    console.error('复制失败:', error)
-    uiStore.showToast('复制失败', 'error')
-  }
-}
 
 const toggleFavorite = () => {
   favoriteStore.toggleFavorite(props.color)
-  const message = isFavorite.value ? '已从收藏中移除' : '已添加到收藏'
-  uiStore.showToast(message, 'success')
+  const message = isFavorite.value ? 
+    `已收藏 ${props.color.chinese}` : 
+    `已取消收藏 ${props.color.chinese}`
+  uiStore.showMessage(message, 'success')
 }
 
 const generateScheme = () => {
-  // TODO: 实现配色方案生成
-  uiStore.showToast('配色方案功能开发中...', 'info')
+  try {
+    colorScheme.value = colorStore.generateColorScheme(props.color, 'complementary')
+    if (colorScheme.value.length > 0) {
+      uiStore.showMessage('配色方案生成成功', 'success')
+    } else {
+      uiStore.showMessage('配色方案生成失败', 'error')
+    }
+  } catch (error) {
+    console.error('配色方案生成错误:', error)
+    uiStore.showMessage('配色方案生成失败', 'error')
+  }
 }
 
 const findSimilar = () => {
-  similarColors.value = colorStore.getSimilarColors(props.color, 6)
-  uiStore.showToast(`找到 ${similarColors.value.length} 个相似颜色`, 'success')
+  try {
+    similarColors.value = colorStore.getSimilarColors(props.color, 6)
+    if (similarColors.value.length > 0) {
+      uiStore.showMessage(`找到 ${similarColors.value.length} 个相似颜色`, 'success')
+    } else {
+      uiStore.showMessage('未找到相似颜色', 'info')
+    }
+  } catch (error) {
+    console.error('相似颜色查找错误:', error)
+    uiStore.showMessage('相似颜色查找失败', 'error')
+  }
 }
 
-const getTagClass = (tag) => {
-  if (tag.includes('时尚')) return 'tag--fashion'
-  if (tag.includes('季')) return 'tag--season'
-  if (tag.includes('风格')) return 'tag--style'
-  return ''
+const viewSimilarColor = (similarColor) => {
+  emit('view-color', similarColor)
 }
 </script>
 
@@ -241,36 +184,37 @@ const getTagClass = (tag) => {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 2rem;
+  padding: 20px;
 }
 
 .color-detail-modal {
   background: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  max-width: 800px;
+  border-radius: 12px;
+  max-width: 600px;
   width: 100%;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 16px;
+  right: 16px;
   z-index: 10;
   background: rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s;
   
   &:hover {
     background: rgba(0, 0, 0, 0.7);
@@ -278,100 +222,55 @@ const getTagClass = (tag) => {
 }
 
 .color-preview {
-  height: 300px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  
-  &__content {
-    text-align: center;
-  }
-  
-  &__hex {
-    font-family: 'Monaco', 'Menlo', monospace;
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    
-    @media (max-width: 640px) {
-      font-size: 2rem;
-    }
-  }
-  
-  &__names {
-    margin-bottom: 1rem;
-    
-    .chinese-name {
-      font-size: 2rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      
-      @media (max-width: 640px) {
-        font-size: 1.5rem;
-      }
-    }
-    
-    .english-name {
-      font-size: 1.25rem;
-      opacity: 0.9;
-      font-style: italic;
-    }
-  }
+  text-align: center;
 }
 
-.guofeng-badge {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  padding: 0.5rem 1rem;
-  border-radius: 1rem;
-  display: inline-block;
-  
-  span {
-    font-weight: 500;
-  }
+.color-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
 }
 
-.color-details {
-  padding: 2rem;
+.color-subtitle {
+  font-size: 16px;
+  margin: 0 0 8px 0;
+  opacity: 0.9;
 }
 
-.details-grid {
-  display: grid;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.detail-section {
-  &:not(.details-grid > &) {
-    margin-bottom: 2rem;
-  }
-}
-
-.section-title {
-  font-size: 1.125rem;
+.color-hex {
+  font-family: monospace;
+  font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 1rem;
-  border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 0.5rem;
+  margin: 0;
 }
 
-.info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
 }
 
-.info-item {
+.detail-group {
+  margin-bottom: 24px;
+  
+  h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+  }
+}
+
+.detail-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f3f4f6;
   
   .label {
     font-weight: 500;
@@ -379,151 +278,149 @@ const getTagClass = (tag) => {
   }
   
   .value {
-    font-weight: 600;
-    color: #1f2937;
+    font-family: monospace;
+    color: #111827;
     
-    &.category {
-      color: #3498db;
+    &.guofeng {
+      color: #dc2626;
+      font-weight: 600;
     }
   }
 }
 
-.color-values {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.value-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  
-  .value-label {
-    font-weight: 600;
-    color: #374151;
-    min-width: 60px;
-  }
-  
-  .value-content {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex: 1;
-    justify-content: flex-end;
-  }
-  
-  .value-text {
-    font-family: 'Monaco', 'Menlo', monospace;
-    font-size: 0.875rem;
-    color: #1f2937;
-    background: #f3f4f6;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-  }
-  
-  .copy-btn {
-    background: none;
-    border: none;
-    color: #6b7280;
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 0.25rem;
-    transition: all 0.2s;
-    
-    &:hover {
-      background: #f3f4f6;
-      color: #3498db;
-    }
-  }
-}
-
-.tags-container {
+.tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .tag {
-  padding: 0.375rem 0.75rem;
   background: #f3f4f6;
   color: #374151;
-  border-radius: 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
   
-  &--fashion {
-    background: #fce7f3;
-    color: #be185d;
-  }
-  
-  &--season {
-    background: #dcfce7;
-    color: #166534;
-  }
-  
-  &--style {
-    background: #ede9fe;
-    color: #7c3aed;
+  @media (max-width: 480px) {
+    flex-direction: column;
   }
 }
 
-.actions-section {
+.action-btn {
+  flex: 1;
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
   
-  .action-btn {
-    flex: 1;
-    min-width: 150px;
-    
-    @media (max-width: 640px) {
-      flex: none;
-      width: 100%;
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  &:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+  }
+  
+  &.favorite-btn {
+    &:hover {
+      border-color: #ef4444;
+      color: #ef4444;
     }
+    
+    .is-favorite {
+      color: #ef4444;
+      fill: currentColor;
+    }
+  }
+}
+
+.scheme-result, .similar-result {
+  margin-top: 20px;
+  
+  h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+.scheme-colors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 8px;
+}
+
+.scheme-color {
+  height: 60px;
+  border-radius: 6px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  padding: 8px;
+  
+  .scheme-hex {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-family: monospace;
   }
 }
 
 .similar-colors {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
 }
 
 .similar-color {
   height: 80px;
-  border-radius: 0.5rem;
+  border-radius: 6px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: end;
   cursor: pointer;
-  transition: all 0.2s;
-  font-family: 'Monaco', 'Menlo', monospace;
-  font-size: 0.75rem;
-  font-weight: 600;
+  transition: transform 0.2s;
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
   }
 }
 
-@media (max-width: 640px) {
-  .modal-overlay {
-    padding: 1rem;
+.similar-info {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 6px;
+  border-radius: 0 0 6px 6px;
+  width: 100%;
+  
+  .similar-name {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
   }
   
-  .color-details {
-    padding: 1rem;
-  }
-  
-  .details-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .actions-section {
-    flex-direction: column;
+  .similar-hex {
+    display: block;
+    font-size: 10px;
+    font-family: monospace;
+    opacity: 0.9;
   }
 }
 </style>

@@ -1,29 +1,29 @@
-// ===== src/components/search/FilterPanel.vue =====
+<!-- 修复后的 FilterPanel.vue -->
 <template>
-  <div class="filter-panel">
-    <div class="filter-panel__header">
-      <h3 class="filter-panel__title">筛选条件</h3>
+  <div class="fixed-filter-panel">
+    <div class="fixed-filter-header">
+      <h3 class="fixed-filter-title">筛选条件</h3>
       <button
         @click="clearAllFilters"
-        class="filter-panel__clear"
+        class="fixed-filter-clear"
         v-if="hasActiveFilters"
       >
         清除筛选
       </button>
     </div>
     
-    <div class="filter-panel__content">
+    <div class="fixed-filter-content">
       <!-- 分类筛选 -->
-      <div class="filter-panel__section">
-        <h4 class="filter-panel__section-title">颜色分类</h4>
-        <div class="filter-panel__categories">
+      <div class="fixed-filter-section">
+        <h4 class="fixed-section-title">颜色分类</h4>
+        <div class="fixed-categories">
           <button
             v-for="category in colorStore.categories"
             :key="category"
             @click="toggleCategory(category)"
             :class="[
-              'filter-panel__category',
-              { 'filter-panel__category--active': activeFilters.category === category }
+              'fixed-category-btn',
+              { 'fixed-category-btn--active': activeFilters.category === category }
             ]"
           >
             {{ category }}
@@ -32,33 +32,33 @@
       </div>
       
       <!-- 国风颜色筛选 -->
-      <div class="filter-panel__section">
-        <label class="filter-panel__checkbox">
+      <div class="fixed-filter-section">
+        <label class="fixed-checkbox">
           <input
             v-model="activeFilters.hasGuofeng"
             @change="updateGuofengFilter"
             type="checkbox"
           />
-          <span class="filter-panel__checkbox-label">只显示国风传统色彩</span>
+          <span class="fixed-checkbox-label">只显示国风传统色彩</span>
         </label>
       </div>
       
-      <!-- 标签筛选 -->
-      <div class="filter-panel__section">
-        <h4 class="filter-panel__section-title">
+      <!-- 修复后的时尚标签 -->
+      <div class="fixed-filter-section">
+        <h4 class="fixed-section-title">
           时尚标签
-          <span v-if="activeFilters.tags.length > 0" class="filter-panel__tag-count">
+          <span v-if="activeFilters.tags.length > 0" class="fixed-tag-count">
             ({{ activeFilters.tags.length }})
           </span>
         </h4>
-        <div class="filter-panel__tags">
+        <div class="fixed-tags-grid">
           <button
             v-for="tag in popularTags"
             :key="tag"
             @click="toggleTag(tag)"
             :class="[
-              'filter-panel__tag',
-              { 'filter-panel__tag--active': activeFilters.tags.includes(tag) },
+              'fixed-tag-btn',
+              { 'fixed-tag-btn--active': activeFilters.tags.includes(tag) },
               getTagClass(tag)
             ]"
           >
@@ -95,7 +95,7 @@ const popularTags = computed(() => {
   
   return Object.entries(tagCounts)
     .sort(([,a], [,b]) => b - a)
-    .slice(0, 20)
+    .slice(0, 15)
     .map(([tag]) => tag)
 })
 
@@ -117,166 +117,189 @@ const clearAllFilters = () => {
 }
 
 const getTagClass = (tag) => {
-  if (tag.includes('时尚')) return 'filter-panel__tag--fashion'
-  if (tag.includes('季')) return 'filter-panel__tag--season'
-  if (tag.includes('风格')) return 'filter-panel__tag--style'
+  if (tag.includes('时尚')) return 'fixed-tag-btn--fashion'
+  if (tag.includes('季')) return 'fixed-tag-btn--season'
+  if (tag.includes('风格')) return 'fixed-tag-btn--style'
   return ''
 }
 </script>
 
 <style lang="scss" scoped>
-.filter-panel {
+.fixed-filter-panel {
   background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
+.fixed-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.fixed-filter-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.fixed-filter-clear {
+  background: none;
+  border: none;
+  color: #3498db;
+  cursor: pointer;
+  font-size: 12px;
+  transition: color 0.2s;
   
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
+  &:hover {
+    color: #2980b9;
+  }
+}
+
+.fixed-filter-content {
+  display: grid;
+  gap: 16px;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
   }
   
-  &__title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0;
+  @media (min-width: 1024px) {
+    grid-template-columns: 2fr 1fr 3fr;
   }
+}
+
+.fixed-filter-section {
+  &:last-child {
+    @media (min-width: 768px) and (max-width: 1023px) {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.fixed-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.fixed-tag-count {
+  color: #3498db;
+  font-weight: 500;
+}
+
+.fixed-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fixed-category-btn {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  color: #374151;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
   
-  &__clear {
-    background: none;
-    border: none;
+  &:hover {
+    border-color: #3498db;
     color: #3498db;
-    cursor: pointer;
-    font-size: 0.875rem;
-    transition: color 0.2s;
-    
-    &:hover {
-      color: #2980b9;
-    }
   }
   
-  &__content {
-    display: grid;
-    gap: 1.5rem;
-    
-    @media (min-width: 768px) {
-      grid-template-columns: 1fr 1fr;
-    }
-    
-    @media (min-width: 1024px) {
-      grid-template-columns: 2fr 1fr 3fr;
-    }
+  &--active {
+    background: #3498db;
+    border-color: #3498db;
+    color: white;
   }
+}
+
+.fixed-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
   
-  &__section {
-    &:last-child {
-      @media (min-width: 768px) and (max-width: 1023px) {
-        grid-column: 1 / -1;
-      }
-    }
+  input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: #3498db;
   }
+}
+
+.fixed-checkbox-label {
+  font-size: 12px;
+  color: #374151;
+}
+
+/* 修复时尚标签排版 */
+.fixed-tags-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 6px;
   
-  &__section-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #374151;
-    margin: 0 0 1rem 0;
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 4px;
   }
+}
+
+.fixed-tag-btn {
+  padding: 4px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: white;
+  color: #374151;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
   
-  &__tag-count {
+  &:hover {
+    border-color: #3498db;
     color: #3498db;
-    font-weight: 500;
   }
   
-  &__categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+  &--active {
+    background: #3498db;
+    border-color: #3498db;
+    color: white;
   }
   
-  &__category {
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    background: white;
-    color: #374151;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s;
+  &--fashion {
+    border-color: #e91e63;
+    color: #e91e63;
     
-    &:hover {
-      border-color: #3498db;
-      color: #3498db;
-    }
-    
-    &--active {
-      background: #3498db;
-      border-color: #3498db;
+    &.fixed-tag-btn--active {
+      background: #e91e63;
       color: white;
     }
   }
   
-  &__checkbox {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
+  &--season {
+    border-color: #27ae60;
+    color: #27ae60;
     
-    input[type="checkbox"] {
-      width: 1rem;
-      height: 1rem;
-      accent-color: #3498db;
+    &.fixed-tag-btn--active {
+      background: #27ae60;
+      color: white;
     }
   }
   
-  &__checkbox-label {
-    font-size: 0.875rem;
-    color: #374151;
-  }
-  
-  &__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.375rem;
-  }
-  
-  &__tag {
-    @extend .tag !optional;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
+  &--style {
+    border-color: #9b59b6;
+    color: #9b59b6;
     
-    &--fashion {
-      border-color: #e91e63;
-      color: #e91e63;
-      
-      &.filter-panel__tag--active {
-        background: #e91e63;
-        color: white;
-      }
-    }
-    
-    &--season {
-      border-color: #27ae60;
-      color: #27ae60;
-      
-      &.filter-panel__tag--active {
-        background: #27ae60;
-        color: white;
-      }
-    }
-    
-    &--style {
-      border-color: #9b59b6;
-      color: #9b59b6;
-      
-      &.filter-panel__tag--active {
-        background: #9b59b6;
-        color: white;
-      }
+    &.fixed-tag-btn--active {
+      background: #9b59b6;
+      color: white;
     }
   }
 }
