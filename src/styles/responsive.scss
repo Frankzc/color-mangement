@@ -1,0 +1,104 @@
+// ===== src/styles/responsive.scss =====
+// 移动端优化
+@media (max-width: $breakpoint-md) {
+  .nav-tabs {
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+  
+  .nav-tab {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .search-bar {
+    flex-direction: column;
+    
+    .search-input {
+      min-width: auto;
+    }
+  }
+  
+  .color-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: $spacing-md;
+  }
+  
+  .modal__content {
+    margin: $spacing-md;
+    max-width: calc(100vw - #{$spacing-md * 2});
+  }
+  
+  .toast {
+    right: $spacing-md;
+    left: $spacing-md;
+    min-width: auto;
+  }
+}
+
+// 触摸设备优化
+@media (hover: none) and (pointer: coarse) {
+  .color-card {
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+  
+  .btn {
+    min-height: 44px; // iOS推荐的最小触摸目标
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+  
+  .tag {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+// 高分辨率屏幕优化
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .color-card__preview {
+    background-size: cover;
+  }
+}
+
+// 深色模式支持（预留）
+@media (prefers-color-scheme: dark) {
+  // 这里可以添加深色模式样式
+  // 暂时保留，后续可能会用到
+}
+
+// 动画偏好设置
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// 打印样式
+@media print {
+  .nav,
+  .btn,
+  .modal,
+  .toast {
+    display: none !important;
+  }
+  
+  .color-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid $gray-300;
+  }
+}

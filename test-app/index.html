@@ -1,0 +1,115 @@
+<!-- ===== public/index.html ===== -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="专业时装设计师颜色管理系统，提供智能颜色搜索、配色推荐、色环选择等功能">
+    <meta name="keywords" content="时装设计,颜色管理,配色方案,色彩搭配,设计工具,Fashion,Color,Palette">
+    <meta name="author" content="Fashion Color App">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="时装设计师颜色管理系统">
+    <meta property="og:description" content="专业的颜色管理工具，为时装设计师提供完整的色彩解决方案">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/og-image.png">
+    
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="时装设计师颜色管理系统">
+    <meta name="twitter:description" content="专业的颜色管理工具，为时装设计师提供完整的色彩解决方案">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#2C3E50">
+    <meta name="msapplication-TileColor" content="#2C3E50">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/colors.json" as="fetch" crossorigin="anonymous">
+    
+    <!-- Fonts (Optional - you can add Google Fonts here) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <title>时装设计师颜色管理系统</title>
+    
+    <!-- Loading styles -->
+    <style>
+        #app-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 18px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        .loading-subtitle {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 加载中的占位内容 -->
+        <div id="app-loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">时装设计师颜色管理系统</div>
+            <div class="loading-subtitle">正在加载中...</div>
+        </div>
+    </div>
+    
+    <script type="module" src="/src/main.js"></script>
+    
+    <!-- 移除加载屏幕 -->
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loading = document.getElementById('app-loading');
+                if (loading) {
+                    loading.style.opacity = '0';
+                    loading.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        loading.remove();
+                    }, 500);
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

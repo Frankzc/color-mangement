@@ -1,0 +1,97 @@
+// ===== src/styles/base.scss =====
+// 重置样式
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+  color: $gray-800;
+  background-color: $gray-50;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// 基础排版
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin-bottom: $spacing-md;
+}
+
+h1 { font-size: $text-3xl; }
+h2 { font-size: $text-2xl; }
+h3 { font-size: $text-xl; }
+h4 { font-size: $text-lg; }
+h5 { font-size: $text-base; }
+h6 { font-size: $text-sm; }
+
+p {
+  margin-bottom: $spacing-md;
+}
+
+a {
+  color: $primary-blue;
+  text-decoration: none;
+  transition: color $transition-base;
+  
+  &:hover {
+    color: darken($primary-blue, 15%);
+  }
+}
+
+// 按钮基础样式
+button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+// 输入框基础样式
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+// 图片响应式
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+// 滚动条样式
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $gray-100;
+  border-radius: $rounded;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $gray-400;
+  border-radius: $rounded;
+  
+  &:hover {
+    background: $gray-500;
+  }
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
