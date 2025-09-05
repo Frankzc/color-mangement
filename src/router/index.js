@@ -68,10 +68,8 @@ const routes = [
     name: 'Login',
     component: LoginView,
     meta: {
-      title: '登录',
-      description: '用户登录',
-      hideNavigation: true,
-      transition: 'fade'
+      title: '用户登录',
+      description: '登录到颜色管理系统'
     }
   },
   {

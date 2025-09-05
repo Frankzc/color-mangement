@@ -1,107 +1,184 @@
-<!-- 修复后的 SortControls.vue -->
 <template>
-  <div class="fixed-sort-controls">
-    <label class="fixed-sort-label">排序：</label>
-    <select 
-      :value="sortBy" 
-      @change="handleSortChange"
-      class="fixed-sort-select"
-    >
-      <option
-        v-for="option in sortOptions"
-        :key="option.value"
-        :value="option.value"
+  <div class="sort-controls">
+    <div class="sort-group">
+      <label class="sort-label">排序方式:</label>
+      <select 
+        v-model="currentSort" 
+        @change="handleSortChange"
+        class="sort-select"
       >
-        {{ option.label }}
-      </option>
-    </select>
+        <option value="name_asc">名称 A-Z</option>
+        <option value="name_desc">名称 Z-A</option>
+        <option value="hue_asc">色相 0-360</option>
+        <option value="hue_desc">色相 360-0</option>
+        <option value="brightness_asc">亮度 暗-亮</option>
+        <option value="brightness_desc">亮度 亮-暗</option>
+        <option value="category_asc">分类 A-Z</option>
+        <option value="category_desc">分类 Z-A</option>
+        <option value="random">随机排序</option>
+      </select>
+    </div>
     
-    <button
-      @click="toggleSortOrder"
-      class="fixed-sort-order"
-      :title="sortOrder === 'asc' ? '升序' : '降序'"
-    >
-      <ArrowUpIcon v-if="sortOrder === 'asc'" class="sort-icon" />
-      <ArrowDownIcon v-else class="sort-icon" />
-    </button>
+    <div class="view-controls">
+      <button
+        @click="toggleViewMode"
+        class="view-toggle"
+        :title="viewMode === 'grid' ? '切换到列表视图' : '切换到网格视图'"
+      >
+        <Squares2X2Icon v-if="viewMode === 'grid'" class="view-icon" />
+        <ListBulletIcon v-else class="view-icon" />
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useColorStore } from '@stores/colorStore'
-import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/vue/24/outline'
-import { SORT_OPTIONS } from '@utils/constants'
+import { useUiStore } from '@stores/uiStore'
+import { Squares2X2Icon, ListBulletIcon } from '@heroicons/vue/24/outline'
 
 const colorStore = useColorStore()
+const uiStore = useUiStore()
 
-const sortBy = computed(() => colorStore.sortBy)
-const sortOrder = computed(() => colorStore.sortOrder)
-const sortOptions = SORT_OPTIONS
+const currentSort = ref('name_asc')
+const viewMode = ref('grid')
 
-const handleSortChange = (event) => {
-  colorStore.setSorting(event.target.value, sortOrder.value)
+// 从store中获取当前排序设置
+const initializeSort = () => {
+  currentSort.value = colorStore.currentSort || 'name_asc'
 }
 
-const toggleSortOrder = () => {
-  colorStore.toggleSortOrder()
+const handleSortChange = () => {
+  const [field, direction] = currentSort.value.split('_')
+  
+  console.log('排序变更:', field, direction) // 调试信息
+  
+  try {
+    colorStore.setSortOrder(field, direction)
+    uiStore.showMessage(`已按${getSortLabel(currentSort.value)}排序`, 'info')
+  } catch (error) {
+    console.error('排序失败:', error)
+    uiStore.showMessage('排序失败，请重试', 'error')
+  }
 }
+
+const getSortLabel = (sortValue) => {
+  const labels = {
+    'name_asc': '名称正序',
+    'name_desc': '名称倒序',
+    'hue_asc': '色相正序',
+    'hue_desc': '色相倒序',
+    'brightness_asc': '亮度正序',
+    'brightness_desc': '亮度倒序',
+    'category_asc': '分类正序',
+    'category_desc': '分类倒序',
+    'random': '随机顺序'
+  }
+  return labels[sortValue] || '默认'
+}
+
+const toggleViewMode = () => {
+  viewMode.value = viewMode.value === 'grid' ? 'list' : 'grid'
+  // 可以通过emit或store通知父组件视图模式变更
+  // emit('view-mode-change', viewMode.value)
+}
+
+// 监听store中的排序变化
+watch(() => colorStore.currentSort, (newSort) => {
+  if (newSort && newSort !== currentSort.value) {
+    currentSort.value = newSort
+  }
+})
+
+// 初始化
+initializeSort()
 </script>
 
 <style lang="scss" scoped>
-.fixed-sort-controls {
+.sort-controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   
   @media (max-width: 768px) {
-    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
   }
 }
 
-.fixed-sort-label {
-  font-size: 12px;
-  color: #6b7280;
+.sort-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.sort-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
   white-space: nowrap;
 }
 
-.fixed-sort-select {
-  padding: 6px 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
+.sort-select {
+  padding: 8px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
   background: white;
-  font-size: 12px;
+  color: #374151;
   cursor: pointer;
-  min-width: 120px;
+  transition: border-color 0.2s;
+  min-width: 140px;
   
   &:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 1px rgba(52, 152, 219, 0.1);
+    border-color: #3b82f6;
   }
   
-  @media (max-width: 768px) {
-    flex: 1;
-    min-width: auto;
+  &:hover {
+    border-color: #d1d5db;
   }
 }
 
-.fixed-sort-order {
+.view-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.view-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
   background: white;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  padding: 6px;
   cursor: pointer;
   transition: all 0.2s;
   
   &:hover {
-    border-color: #3498db;
-    color: #3498db;
+    border-color: #3b82f6;
+    background: #f8fafc;
   }
 }
 
-.sort-icon {
-  width: 14px;
-  height: 14px;
+.view-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
 }
 </style>

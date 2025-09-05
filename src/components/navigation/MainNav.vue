@@ -1,4 +1,3 @@
-// ===== src/components/navigation/MainNav.vue =====
 <template>
   <nav class="main-nav">
     <div class="main-nav__container">
@@ -72,12 +71,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useFavoriteStore } from '@stores/favoriteStore'
-import { useUserStore } from '@stores/userStore'
+import { useFavoriteStore } from '@/stores/favoriteStore'
+import { useUserStore } from '@/stores/userStore'
 import {
   MagnifyingGlassIcon,
   PhotoIcon,
-  SwatchIcon,  // 改为 SwatchIcon
+  Squares2X2Icon, // 改为这个图标，更适合色环选色
   HeartIcon,
   UserCircleIcon,
   Bars3Icon,
@@ -108,7 +107,7 @@ const navItems = [
     name: 'wheel',
     path: '/wheel',
     label: '色环选色',
-    icon: SwatchIcon
+    icon: Squares2X2Icon
   },
   {
     name: 'favorites',
@@ -359,10 +358,19 @@ onUnmounted(() => {
   }
   
   &__login {
-    @include button-style(#3498db);
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     text-decoration: none;
+    background: #3498db;
+    color: white;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    
+    &:hover {
+      background: #2980b9;
+      transform: translateY(-1px);
+    }
   }
   
   &__mobile-toggle {
