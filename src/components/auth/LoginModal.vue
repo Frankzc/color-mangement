@@ -56,12 +56,12 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useUiStore } from '@stores/uiStore'
+import { useUIStore } from '@stores/uiStore'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 const emit = defineEmits(['close', 'login'])
 
-const uiStore = useUiStore()
+const uiStore = useUIStore()
 
 const username = ref('')
 const password = ref('')

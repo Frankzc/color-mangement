@@ -1,4 +1,4 @@
-// ===== src/styles/components.scss =====
+/* ===== src/styles/components.scss ===== */
 // 按钮组件样式
 .btn {
   @include button-style($primary-blue);
@@ -50,34 +50,6 @@
   }
 }
 
-// 输入框组件样式
-.input {
-  width: 100%;
-  padding: $spacing-sm $spacing-md;
-  border: 2px solid $gray-300;
-  border-radius: $rounded-lg;
-  transition: all $transition-base;
-  
-  &:focus {
-    outline: none;
-    border-color: $primary-blue;
-    box-shadow: 0 0 0 3px rgba($primary-blue, 0.1);
-  }
-  
-  &:disabled {
-    background: $gray-100;
-    cursor: not-allowed;
-  }
-  
-  &--error {
-    border-color: $primary-coral;
-    
-    &:focus {
-      box-shadow: 0 0 0 3px rgba($primary-coral, 0.1);
-    }
-  }
-}
-
 // 标签组件样式
 .tag {
   display: inline-block;
@@ -86,172 +58,21 @@
   color: $gray-700;
   border-radius: $rounded;
   font-size: $text-sm;
-  font-weight: 500;
-  transition: all $transition-base;
-  cursor: pointer;
   
-  &:hover {
-    background: $gray-300;
+  &--primary { 
+    background: $primary-blue; 
+    color: white; 
   }
-  
-  &--active {
-    background: $primary-blue;
-    color: white;
-    
-    &:hover {
-      background: darken($primary-blue, 10%);
-    }
+  &--success { 
+    background: $primary-emerald; 
+    color: white; 
   }
-  
-  &--fashion {
-    background: $primary-rose;
-    color: white;
+  &--warning { 
+    background: $primary-amber; 
+    color: white; 
   }
-  
-  &--season {
-    background: $primary-emerald;
-    color: white;
-  }
-  
-  &--style {
-    background: $primary-purple;
-    color: white;
-  }
-}
-
-// 模态框组件样式
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  
-  &__content {
-    background: white;
-    border-radius: $rounded-xl;
-    box-shadow: $shadow-xl;
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow: auto;
-  }
-}
-
-// 提示组件样式
-.toast {
-  position: fixed;
-  top: $spacing-lg;
-  right: $spacing-lg;
-  min-width: 300px;
-  padding: $spacing-md;
-  border-radius: $rounded-lg;
-  box-shadow: $shadow-lg;
-  z-index: 1100;
-  transform: translateX(100%);
-  transition: transform $transition-base;
-  
-  &--show {
-    transform: translateX(0);
-  }
-  
-  &--info {
-    background: $primary-blue;
-    color: white;
-  }
-  
-  &--success {
-    background: $primary-emerald;
-    color: white;
-  }
-  
-  &--warning {
-    background: $primary-amber;
-    color: white;
-  }
-  
-  &--error {
-    background: $primary-coral;
-    color: white;
-  }
-}
-
-// 加载器组件样式
-.loading {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  
-  &__spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid $gray-200;
-    border-top: 4px solid $primary-blue;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-// 颜色相关样式
-.color-card {
-  @include card-style;
-  
-  &__preview {
-    height: 120px;
-    position: relative;
-    
-    &--large {
-      height: 200px;
-    }
-  }
-  
-  &__info {
-    padding: $spacing-md;
-  }
-  
-  &__name {
-    font-weight: 600;
-    margin-bottom: $spacing-xs;
-  }
-  
-  &__details {
-    font-size: $text-sm;
-    color: $gray-600;
-    margin-bottom: $spacing-sm;
-  }
-  
-  &__actions {
-    display: flex;
-    gap: $spacing-sm;
-  }
-}
-
-.color-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: $spacing-lg;
-  
-  @include respond-to(md) {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }
-  
-  @include respond-to(lg) {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  &--danger { 
+    background: $primary-coral; 
+    color: white; 
   }
 }

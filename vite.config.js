@@ -1,4 +1,4 @@
-// ===== vite.config.js =====
+// vite.config.js - 修复SCSS配置
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import legacy from '@vitejs/plugin-legacy'
@@ -25,7 +25,10 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "@styles/variables.scss";`
+        // 使用新的 Sass API，避免 deprecation 警告
+        api: 'modern-compiler',
+        // 全局导入变量文件，使用 @use 而不是 @import
+        additionalData: `@use "@styles/variables.scss" as *;`
       }
     }
   },
@@ -52,18 +55,11 @@ export default defineConfig({
     }
   },
   server: {
-    host: '0.0.0.0',
     port: 3000,
     open: true,
     cors: true
   },
   preview: {
-    host: '0.0.0.0',
-    port: 4173,
-    open: true
-  },
-  define: {
-    __VUE_OPTIONS_API__: false,
-    __VUE_PROD_DEVTOOLS__: false
+    port: 5000
   }
 })

@@ -1,4 +1,4 @@
-// ===== src/styles/base.scss =====
+/* ===== src/styles/base.scss ===== */
 // 重置样式
 *,
 *::before,
@@ -46,7 +46,7 @@ a {
   transition: color $transition-base;
   
   &:hover {
-    color: darken($primary-blue, 15%);
+    color: darken-color($primary-blue, 15%);
   }
 }
 
@@ -87,11 +87,4 @@ img {
   &:hover {
     background: $gray-500;
   }
-}
-
-.tag {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
 }

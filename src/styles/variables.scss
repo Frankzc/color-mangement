@@ -1,5 +1,7 @@
-// ===== src/styles/variables.scss =====
-// 颜色变量
+// src/styles/variables.scss - 修复deprecation警告版本
+@use 'sass:color';
+
+// 主色彩系统
 $primary-navy: #2C3E50;
 $primary-blue: #3498DB;
 $primary-coral: #E74C3C;
@@ -9,7 +11,7 @@ $primary-rose: #E91E63;
 $primary-purple: #9B59B6;
 $primary-teal: #1ABC9C;
 
-// 中性色
+// 灰色系列 - 完整定义
 $gray-50: #F8F9FA;
 $gray-100: #F1F3F4;
 $gray-200: #E9ECEF;
@@ -21,24 +23,24 @@ $gray-700: #495057;
 $gray-800: #343A40;
 $gray-900: #212529;
 
-// 间距
-$spacing-xs: 0.25rem;
-$spacing-sm: 0.5rem;
-$spacing-md: 1rem;
-$spacing-lg: 1.5rem;
-$spacing-xl: 2rem;
-$spacing-2xl: 3rem;
-$spacing-3xl: 4rem;
+// 间距系统
+$spacing-xs: 0.25rem;   // 4px
+$spacing-sm: 0.5rem;    // 8px
+$spacing-md: 1rem;      // 16px
+$spacing-lg: 1.5rem;    // 24px
+$spacing-xl: 2rem;      // 32px
+$spacing-2xl: 3rem;     // 48px
+$spacing-3xl: 4rem;     // 64px
 
 // 字体大小
-$text-xs: 0.75rem;
-$text-sm: 0.875rem;
-$text-base: 1rem;
-$text-lg: 1.125rem;
-$text-xl: 1.25rem;
-$text-2xl: 1.5rem;
-$text-3xl: 1.875rem;
-$text-4xl: 2.25rem;
+$text-xs: 0.75rem;      // 12px
+$text-sm: 0.875rem;     // 14px
+$text-base: 1rem;       // 16px
+$text-lg: 1.125rem;     // 18px
+$text-xl: 1.25rem;      // 20px
+$text-2xl: 1.5rem;      // 24px
+$text-3xl: 1.875rem;    // 30px
+$text-4xl: 2.25rem;     // 36px
 
 // 圆角
 $rounded-sm: 0.125rem;
@@ -68,61 +70,72 @@ $breakpoint-lg: 1024px;
 $breakpoint-xl: 1280px;
 $breakpoint-2xl: 1536px;
 
-// 混合器
-@mixin respond-to($breakpoint) {
-  @if $breakpoint == sm {
-    @media (min-width: $breakpoint-sm) { @content; }
-  }
-  @if $breakpoint == md {
-    @media (min-width: $breakpoint-md) { @content; }
-  }
-  @if $breakpoint == lg {
-    @media (min-width: $breakpoint-lg) { @content; }
-  }
-  @if $breakpoint == xl {
-    @media (min-width: $breakpoint-xl) { @content; }
-  }
-  @if $breakpoint == 2xl {
-    @media (min-width: $breakpoint-2xl) { @content; }
-  }
+// 修复的颜色函数 - 使用新的 Sass API
+@function darken-color($color, $amount: 10%) {
+  @return color.scale($color, $lightness: -$amount);
 }
 
-@mixin button-style($bg-color, $text-color: white) {
+@function lighten-color($color, $amount: 10%) {
+  @return color.scale($color, $lightness: $amount);
+}
+
+// Mixins 
+@mixin button-style($bg-color: $primary-blue, $text-color: white) {
   background-color: $bg-color;
   color: $text-color;
   border: none;
-  border-radius: $rounded-lg;
   padding: $spacing-sm $spacing-md;
-  font-weight: 500;
-  transition: all $transition-base;
+  border-radius: $rounded-md;
   cursor: pointer;
+  transition: $transition-base;
+  font-weight: 500;
   
   &:hover {
-    background-color: darken($bg-color, 10%);
-    transform: translateY(-1px);
-    box-shadow: $shadow-md;
+    background-color: darken-color($bg-color, 10%);
   }
   
-  &:active {
-    transform: translateY(0);
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($bg-color, 0.3);
   }
   
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
+    
+    &:hover {
+      background-color: $bg-color;
+    }
   }
 }
 
-@mixin card-style {
+@mixin card-style($padding: $spacing-lg) {
   background: white;
-  border-radius: $rounded-xl;
+  border-radius: $rounded-lg;
   box-shadow: $shadow;
-  overflow: hidden;
-  transition: all $transition-base;
+  padding: $padding;
   
   &:hover {
     box-shadow: $shadow-lg;
     transform: translateY(-2px);
+  }
+}
+
+@mixin input-style {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid $gray-300;
+  border-radius: $rounded-md;
+  font-size: $text-base;
+  transition: $transition-base;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-blue;
+    box-shadow: 0 0 0 3px rgba($primary-blue, 0.1);
+  }
+  
+  &::placeholder {
+    color: $gray-500;
   }
 }

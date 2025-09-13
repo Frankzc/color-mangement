@@ -1,65 +1,79 @@
-<!-- 修复后的 FilterPanel.vue -->
+<!-- src/components/search/FilterPanel.vue -->
 <template>
-  <div class="fixed-filter-panel">
-    <div class="fixed-filter-header">
-      <h3 class="fixed-filter-title">筛选条件</h3>
-      <button
+  <div class="filter-panel">
+    <div class="filter-panel__header">
+      <h3 class="filter-panel__title">
+        <FilterIcon class="w-5 h-5" />
+        <span>筛选条件</span>
+      </h3>
+      <button 
+        v-if="hasActiveFilters" 
         @click="clearAllFilters"
-        class="fixed-filter-clear"
-        v-if="hasActiveFilters"
+        class="filter-panel__clear"
       >
-        清除筛选
+        <XIcon class="w-4 h-4" />
+        <span>清除</span>
       </button>
     </div>
     
-    <div class="fixed-filter-content">
-      <!-- 分类筛选 -->
-      <div class="fixed-filter-section">
-        <h4 class="fixed-section-title">颜色分类</h4>
-        <div class="fixed-categories">
+    <div class="filter-panel__content">
+      <!-- 国风色彩筛选 -->
+      <div class="filter-group">
+        <h4 class="filter-group__title">特色筛选</h4>
+        <div class="filter-options">
           <button
-            v-for="category in colorStore.categories"
-            :key="category"
-            @click="toggleCategory(category)"
+            @click="toggleGuofengFilter"
             :class="[
-              'fixed-category-btn',
-              { 'fixed-category-btn--active': activeFilters.category === category }
+              'filter-option',
+              { 'filter-option--active': colorStore.activeFilters.hasGuofeng }
             ]"
           >
-            {{ category }}
+            <span class="filter-option__icon">🎨</span>
+            <span>国风色彩</span>
+            <span class="filter-option__count">({{ guofengCount }})</span>
           </button>
         </div>
       </div>
       
-      <!-- 国风颜色筛选 -->
-      <div class="fixed-filter-section">
-        <label class="fixed-checkbox">
-          <input
-            v-model="activeFilters.hasGuofeng"
-            @change="updateGuofengFilter"
-            type="checkbox"
-          />
-          <span class="fixed-checkbox-label">只显示国风传统色彩</span>
-        </label>
+      <!-- 分类筛选 -->
+      <div class="filter-group" v-if="colorStore.categories.length > 0">
+        <h4 class="filter-group__title">颜色分类</h4>
+        <div class="filter-options">
+          <button
+            v-for="category in colorStore.categories"
+            :key="category"
+            @click="toggleCategoryFilter(category)"
+            :class="[
+              'filter-option',
+              { 'filter-option--active': colorStore.activeFilters.category === category }
+            ]"
+          >
+            <span class="filter-option__color" :style="{ backgroundColor: getCategoryColor(category) }"></span>
+            <span>{{ category }}</span>
+          </button>
+        </div>
       </div>
       
-      <!-- 修复后的时尚标签 -->
-      <div class="fixed-filter-section">
-        <h4 class="fixed-section-title">
-          时尚标签
-          <span v-if="activeFilters.tags.length > 0" class="fixed-tag-count">
-            ({{ activeFilters.tags.length }})
-          </span>
+      <!-- 标签筛选 -->
+      <div class="filter-group" v-if="displayTags.length > 0">
+        <h4 class="filter-group__title">
+          <span>标签筛选</span>
+          <button 
+            v-if="colorStore.allTags.length > maxDisplayTags"
+            @click="showAllTags = !showAllTags"
+            class="filter-group__toggle"
+          >
+            {{ showAllTags ? '收起' : '展开' }}
+          </button>
         </h4>
-        <div class="fixed-tags-grid">
+        <div class="filter-options">
           <button
-            v-for="tag in popularTags"
+            v-for="tag in displayTags"
             :key="tag"
-            @click="toggleTag(tag)"
+            @click="toggleTagFilter(tag)"
             :class="[
-              'fixed-tag-btn',
-              { 'fixed-tag-btn--active': activeFilters.tags.includes(tag) },
-              getTagClass(tag)
+              'filter-option filter-option--tag',
+              { 'filter-option--active': colorStore.activeFilters.tags.includes(tag) }
             ]"
           >
             {{ tag }}
@@ -71,236 +85,275 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useColorStore } from '@stores/colorStore'
+import { ref, computed } from 'vue'
+import { useColorStore } from '@/stores/colorStore'
+
+// 内联图标组件
+const FilterIcon = {
+  template: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
+  </svg>`
+}
+
+const XIcon = {
+  template: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+  </svg>`
+}
 
 const colorStore = useColorStore()
 
-const activeFilters = computed(() => colorStore.activeFilters)
+// 响应式数据
+const showAllTags = ref(false)
+const maxDisplayTags = 15
+
+// 计算属性
+const guofengCount = computed(() => {
+  return colorStore.colors.filter(c => 
+    c.guofeng && c.guofeng !== 'null' && c.guofeng !== null && c.guofeng.trim() !== ''
+  ).length
+})
+
+const displayTags = computed(() => {
+  const tags = colorStore.allTags
+  return showAllTags.value ? tags : tags.slice(0, maxDisplayTags)
+})
 
 const hasActiveFilters = computed(() => {
-  return activeFilters.value.category ||
-         activeFilters.value.tags.length > 0 ||
-         activeFilters.value.hasGuofeng
+  return colorStore.activeFilters.category ||
+         colorStore.activeFilters.tags.length > 0 ||
+         colorStore.activeFilters.hasGuofeng
 })
 
-// 热门标签
-const popularTags = computed(() => {
-  const tagCounts = {}
-  colorStore.colors.forEach(color => {
-    color.tags.forEach(tag => {
-      tagCounts[tag] = (tagCounts[tag] || 0) + 1
-    })
-  })
-  
-  return Object.entries(tagCounts)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, 15)
-    .map(([tag]) => tag)
-})
+// 方法
+const toggleGuofengFilter = () => {
+  console.log('切换国风筛选')
+  colorStore.setFilter('hasGuofeng', !colorStore.activeFilters.hasGuofeng)
+}
 
-const toggleCategory = (category) => {
-  const currentCategory = activeFilters.value.category
+const toggleCategoryFilter = (category) => {
+  console.log('切换分类筛选:', category)
+  const currentCategory = colorStore.activeFilters.category
   colorStore.setFilter('category', currentCategory === category ? '' : category)
 }
 
-const toggleTag = (tag) => {
-  colorStore.setFilter('tags', tag)
-}
-
-const updateGuofengFilter = () => {
-  colorStore.setFilter('hasGuofeng', activeFilters.value.hasGuofeng)
+const toggleTagFilter = (tag) => {
+  console.log('切换标签筛选:', tag)
+  const currentTags = [...colorStore.activeFilters.tags]
+  const index = currentTags.indexOf(tag)
+  
+  if (index > -1) {
+    // 移除标签
+    currentTags.splice(index, 1)
+  } else {
+    // 添加标签
+    currentTags.push(tag)
+  }
+  
+  colorStore.setFilter('tags', currentTags)
 }
 
 const clearAllFilters = () => {
+  console.log('清除所有筛选条件')
   colorStore.clearFilters()
 }
 
-const getTagClass = (tag) => {
-  if (tag.includes('时尚')) return 'fixed-tag-btn--fashion'
-  if (tag.includes('季')) return 'fixed-tag-btn--season'
-  if (tag.includes('风格')) return 'fixed-tag-btn--style'
-  return ''
+const getCategoryColor = (category) => {
+  // 为不同分类提供颜色
+  const categoryColors = {
+    '橙色系': '#f97316',
+    '灰色系': '#6b7280',
+    '紫色系': '#a855f7',
+    '红色系': '#ef4444',
+    '绿色系': '#22c55e',
+    '蓝色系': '#3b82f6',
+    '黄色系': '#eab308',
+    '黑白系': '#000000'
+  }
+  return categoryColors[category] || '#9ca3af'
 }
 </script>
 
 <style lang="scss" scoped>
-.fixed-filter-panel {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 16px;
-}
-
-.fixed-filter-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.fixed-filter-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-}
-
-.fixed-filter-clear {
-  background: none;
-  border: none;
-  color: #3498db;
-  cursor: pointer;
-  font-size: 12px;
-  transition: color 0.2s;
+.filter-panel {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
   
-  &:hover {
-    color: #2980b9;
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+  }
+  
+  &__clear {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &:hover {
+      background: #dc2626;
+    }
+  }
+  
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 }
 
-.fixed-filter-content {
-  display: grid;
-  gap: 16px;
-  
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr;
+.filter-group {
+  &__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 0.75rem 0;
   }
   
-  @media (min-width: 1024px) {
-    grid-template-columns: 2fr 1fr 3fr;
-  }
-}
-
-.fixed-filter-section {
-  &:last-child {
-    @media (min-width: 768px) and (max-width: 1023px) {
-      grid-column: 1 / -1;
+  &__toggle {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    font-size: 0.75rem;
+    cursor: pointer;
+    
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
 
-.fixed-section-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 8px 0;
-}
-
-.fixed-tag-count {
-  color: #3498db;
-  font-weight: 500;
-}
-
-.fixed-categories {
+.filter-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 0.5rem;
 }
 
-.fixed-category-btn {
-  padding: 6px 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: white;
-  color: #374151;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  
-  &:hover {
-    border-color: #3498db;
-    color: #3498db;
-  }
-  
-  &--active {
-    background: #3498db;
-    border-color: #3498db;
-    color: white;
-  }
-}
-
-.fixed-checkbox {
+.filter-option {
   display: flex;
   align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  
-  input[type="checkbox"] {
-    width: 14px;
-    height: 14px;
-    accent-color: #3498db;
-  }
-}
-
-.fixed-checkbox-label {
-  font-size: 12px;
-  color: #374151;
-}
-
-/* 修复时尚标签排版 */
-.fixed-tags-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-  gap: 6px;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-    gap: 4px;
-  }
-}
-
-.fixed-tag-btn {
-  padding: 4px 6px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
   background: white;
-  color: #374151;
-  font-size: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
-  text-align: center;
+  color: #374151;
   
   &:hover {
-    border-color: #3498db;
-    color: #3498db;
+    border-color: #3b82f6;
+    background: #eff6ff;
+    color: #1d4ed8;
   }
   
   &--active {
-    background: #3498db;
-    border-color: #3498db;
+    background: #3b82f6;
     color: white;
-  }
-  
-  &--fashion {
-    border-color: #e91e63;
-    color: #e91e63;
+    border-color: #3b82f6;
     
-    &.fixed-tag-btn--active {
-      background: #e91e63;
-      color: white;
+    &:hover {
+      background: #2563eb;
+      border-color: #2563eb;
     }
   }
   
-  &--season {
-    border-color: #27ae60;
-    color: #27ae60;
+  &--tag {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.625rem;
+  }
+  
+  &__icon {
+    font-size: 1rem;
+  }
+  
+  &__color {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+  }
+  
+  &__count {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    font-weight: 500;
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .filter-panel {
+    padding: 1rem;
     
-    &.fixed-tag-btn--active {
-      background: #27ae60;
-      color: white;
+    &__header {
+      margin-bottom: 1rem;
+    }
+    
+    &__title {
+      font-size: 1rem;
+    }
+    
+    &__content {
+      gap: 1rem;
     }
   }
   
-  &--style {
-    border-color: #9b59b6;
-    color: #9b59b6;
+  .filter-options {
+    gap: 0.375rem;
+  }
+  
+  .filter-option {
+    font-size: 0.8125rem;
+    padding: 0.375rem 0.625rem;
     
-    &.fixed-tag-btn--active {
-      background: #9b59b6;
-      color: white;
+    &--tag {
+      font-size: 0.6875rem;
+      padding: 0.25rem 0.5rem;
     }
+  }
+}
+
+// 标签筛选特殊样式
+.filter-option--tag {
+  border-radius: 1rem;
+  font-weight: 500;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  &.filter-option--active {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
   }
 }
 </style>

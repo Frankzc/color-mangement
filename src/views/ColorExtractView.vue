@@ -238,7 +238,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useColorStore } from '@stores/colorStore'
 import { useFavoriteStore } from '@stores/favoriteStore'
-import { useUiStore } from '@stores/uiStore'
+import { useUIStore } from '@stores/uiStore'
 import MainNav from '@components/navigation/MainNav.vue'
 import ColorDetailModal from '@components/color/ColorDetailModal.vue'
 import {
@@ -248,7 +248,7 @@ import {
 
 const colorStore = useColorStore()
 const favoriteStore = useFavoriteStore()
-const uiStore = useUiStore()
+const uiStore = useUIStore()
 
 // 响应式数据
 const fileInput = ref(null)

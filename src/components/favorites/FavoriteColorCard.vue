@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { useUiStore } from '@stores/uiStore'
+import { useUIStore } from '@stores/uiStore'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
@@ -86,7 +86,7 @@ const props = defineProps({
 
 defineEmits(['toggle-select', 'remove', 'view-details'])
 
-const uiStore = useUiStore()
+const uiStore = useUIStore()
 
 const formatDate = (dateString) => {
   if (!dateString) return ''

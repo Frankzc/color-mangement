@@ -71,7 +71,7 @@
 import { ref, computed } from 'vue'
 import { useColorStore } from '@stores/colorStore'
 import { useFavoriteStore } from '@stores/favoriteStore'
-import { useUiStore } from '@stores/uiStore'
+import { useUIStore } from '@stores/uiStore'
 import { HeartIcon } from '@heroicons/vue/24/outline'
 import ColorDetailModal from './ColorDetailModal.vue'
 
@@ -90,7 +90,7 @@ const emit = defineEmits(['color-click', 'load-more'])
 
 const colorStore = useColorStore()
 const favoriteStore = useFavoriteStore()
-const uiStore = useUiStore()
+const uiStore = useUIStore()
 
 const selectedColor = ref(null)
 

@@ -84,7 +84,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useFavoriteStore } from '@stores/favoriteStore'
-import { useUiStore } from '@stores/uiStore'
+import { useUIStore } from '@stores/uiStore'
 import { HeartIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '@components/common/BaseButton.vue'
 
@@ -98,7 +98,7 @@ const props = defineProps({
 const emit = defineEmits(['click', 'view-details'])
 
 const favoriteStore = useFavoriteStore()
-const uiStore = useUiStore()
+const uiStore = useUIStore()
 
 const isFavorite = computed(() => favoriteStore.isFavorite(props.color.hex))
 

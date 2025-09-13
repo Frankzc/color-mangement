@@ -1,66 +1,116 @@
+<!-- src/components/common/BaseLoading.vue -->
 <template>
-  <div class="loading" v-if="show">
-    <div class="loading__content">
-      <div class="loading__spinner"></div>
-      <p class="loading__text" v-if="text">{{ text }}</p>
+  <div :class="loadingClasses">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
     </div>
+    <div v-if="text" class="loading-text">{{ text }}</div>
   </div>
 </template>
 
 <script setup>
-defineProps({
-  show: {
-    type: Boolean,
-    default: true
-  },
+import { computed } from 'vue'
+
+const props = defineProps({
   text: {
     type: String,
-    default: '加载中...'
+    default: ''
+  },
+  overlay: {
+    type: Boolean,
+    default: false
+  },
+  center: {
+    type: Boolean,
+    default: false
+  },
+  size: {
+    type: String,
+    default: 'md',
+    validator: (value) => ['sm', 'md', 'lg'].includes(value)
   }
+})
+
+const loadingClasses = computed(() => {
+  const classes = ['base-loading']
+  
+  if (props.overlay) classes.push('base-loading--overlay')
+  if (props.center) classes.push('base-loading--center')
+  classes.push(`base-loading--${props.size}`)
+  
+  return classes
 })
 </script>
 
 <style lang="scss" scoped>
-.loading {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(5px);
+.base-loading {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  z-index: 9999;
+  gap: 0.75rem;
   
-  &__content {
+  &--overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+    z-index: 9999;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    justify-content: center;
   }
   
-  &__spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e5e7eb;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+  &--center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
   }
   
-  &__text {
-    color: #6b7280;
-    font-size: 0.875rem;
-    margin: 0;
+  &--sm .spinner {
+    width: 1.5rem;
+    height: 1.5rem;
   }
+  
+  &--md .spinner {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  &--lg .spinner {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+.loading-spinner {
+  color: #3498db;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% { 
+    transform: rotate(0deg); 
+  }
+  100% { 
+    transform: rotate(360deg); 
+  }
 }
 </style>
-
-

@@ -162,7 +162,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useFavoriteStore } from '@stores/favoriteStore'
-import { useUiStore } from '@stores/uiStore'
+import { useUIStore } from '@stores/uiStore'
 import {
   HeartIcon,
   MagnifyingGlassIcon,
@@ -180,7 +180,7 @@ import CreateSchemeModal from '@components/favorites/CreateSchemeModal.vue'
 import ColorDetailModal from '@components/color/ColorDetailModal.vue'
 
 const favoriteStore = useFavoriteStore()
-const uiStore = useUiStore()
+const uiStore = useUIStore()
 
 // 响应式数据
 const viewMode = ref('grid') // grid 或 list

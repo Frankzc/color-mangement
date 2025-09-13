@@ -46,13 +46,13 @@
 
 <script setup>
 import { useFavoriteStore } from '@stores/favoriteStore'
-import { useUiStore } from '@stores/uiStore'
+import { useUIStore } from '@stores/uiStore'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 const emit = defineEmits(['close', 'view-color'])
 
 const favoriteStore = useFavoriteStore()
-const uiStore = useUiStore()
+const uiStore = useUIStore()
 
 const viewColor = (color) => {
   emit('view-color', color)

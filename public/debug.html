@@ -1,0 +1,86 @@
+<!-- 放在 public/debug.html - 用于测试数据加载 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>颜色数据测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 4px; }
+        .color-item { margin: 5px 0; padding: 5px; background: white; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>颜色数据加载测试</h1>
+    <button onclick="testColorLoad()">测试加载颜色数据</button>
+    <div id="results"></div>
+
+    <script>
+        async function testColorLoad() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="result">正在加载...</div>';
+            
+            try {
+                console.log('开始测试颜色数据加载...');
+                
+                // 测试网络请求
+                const response = await fetch('/colors.json');
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('原始数据:', data);
+                
+                let colorArray = [];
+                if (data.colors && Array.isArray(data.colors)) {
+                    colorArray = data.colors;
+                } else if (Array.isArray(data)) {
+                    colorArray = data;
+                } else {
+                    throw new Error('数据格式不正确');
+                }
+                
+                console.log('处理后的颜色数组长度:', colorArray.length);
+                
+                // 显示结果
+                resultsDiv.innerHTML = `
+                    <div class="result">
+                        <h3>✅ 成功加载 ${colorArray.length} 个颜色</h3>
+                        <p>数据结构: ${Array.isArray(data) ? '直接数组' : '包含colors属性的对象'}</p>
+                        <p>第一个颜色: ${colorArray[0]?.chinese || '无'} (${colorArray[0]?.hex || '无'})</p>
+                        <h4>前5个颜色:</h4>
+                        ${colorArray.slice(0, 5).map(color => `
+                            <div class="color-item" style="border-left: 4px solid ${color.hex}">
+                                ${color.chinese} - ${color.english} - ${color.hex}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('加载失败:', error);
+                resultsDiv.innerHTML = `
+                    <div class="result" style="background: #ffe6e6; color: #cc0000;">
+                        <h3>❌ 加载失败</h3>
+                        <p>错误信息: ${error.message}</p>
+                        <p>请检查:</p>
+                        <ul>
+                            <li>colors.json 文件是否存在于 public 目录</li>
+                            <li>文件格式是否正确</li>
+                            <li>服务器是否正常运行</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+        
+        // 页面加载时自动测试
+        window.addEventListener('load', testColorLoad);
+    </script>
+</body>
+</html>

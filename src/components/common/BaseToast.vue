@@ -25,7 +25,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useUiStore } from '@stores/uiStore'
+import { useUIStore } from '@stores/uiStore'
 import { 
   CheckCircleIcon, 
   ExclamationTriangleIcon, 
@@ -34,7 +34,7 @@ import {
   XMarkIcon 
 } from '@heroicons/vue/24/outline'
 
-const uiStore = useUiStore()
+const uiStore = useUIStore()
 
 const iconComponent = computed(() => {
   const iconMap = {

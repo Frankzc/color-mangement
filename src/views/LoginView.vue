@@ -157,7 +157,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@stores/userStore'
-import { useUiStore } from '@stores/uiStore'
+import { useUIStore } from '@stores/uiStore'
 import {
   ColorSwatchIcon, UserIcon, LockClosedIcon, EyeIcon, EyeSlashIcon,
   ExclamationCircleIcon, ArrowPathIcon, CogIcon, XMarkIcon
@@ -165,7 +165,7 @@ import {
 
 const router = useRouter()
 const userStore = useUserStore()
-const uiStore = useUiStore()
+const uiStore = useUIStore()
 
 const credentials = reactive({
   username: '',
